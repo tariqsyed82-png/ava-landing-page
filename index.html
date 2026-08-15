@@ -259,6 +259,35 @@
     .float-cta.is-shown{ transform:translateY(0); }
   }
 
+  /* MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(43,35,32,0.55);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .modal-overlay.is-open{ opacity:1; pointer-events:auto; }
+  .modal-panel{
+    background:var(--white);
+    max-width:560px; width:100%;
+    max-height:88vh; overflow-y:auto;
+    padding:36px 32px;
+    border-radius:4px;
+    position:relative;
+    transform:translateY(12px);
+    transition:transform .25s ease;
+  }
+  .modal-overlay.is-open .modal-panel{ transform:translateY(0); }
+  .modal-close{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none; cursor:pointer;
+    font-size:26px; line-height:1; color:var(--chrome);
+    width:32px; height:32px;
+  }
+  .modal-close:hover{ color:var(--wine); }
+
   /* SECTIONS */
   section{padding:80px 0;}
   .section-head{max-width:56ch;margin-bottom:48px;}
@@ -413,7 +442,7 @@
 </style>
 </head>
 <body>
-<a href="#pricing" class="float-cta" id="float-cta">Get Ava</a>
+<a href="#pricing" class="float-cta js-open-modal" id="float-cta">Get Ava</a>
 
 <header>
   <nav class="wrap">
@@ -429,7 +458,7 @@
     <p class="sub">Ava answers while you're mid-cut, books clients straight into your calendar, and fills cancellations before your day develops empty spots — so a missed call never becomes someone else's appointment.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="tel:+12892757217">Call Ava — (289) 275-7217</a>
-      <a class="btn btn-ghost" href="#pricing">Get Ava for my salon</a>
+      <a class="btn btn-ghost js-open-modal" href="#pricing">Get Ava for my salon</a>
     </div>
     <p class="hint">That's a real, live number. No script, no actor — that's Ava. Calls are recorded for quality and training.</p>
   </div>
@@ -664,6 +693,7 @@
   <div class="pricing-box reveal" style="text-align:left;">
     <span class="serif-i" style="text-align:center;display:block;">Plans are based on call volume and salon size.</span>
     <p style="text-align:center;">Tell us a bit about your salon and we'll send a tailored estimate the same day.</p>
+    <div id="lead-form-anchor"></div>
     <form id="lead-form" class="lead-form">
       <div class="lead-row">
         <label>Your name<input type="text" name="name" required></label>
@@ -682,6 +712,15 @@
     </form>
   </div>
 </section>
+
+<div class="modal-overlay" id="modal-overlay" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    <span class="serif-i" id="modal-title" style="display:block;margin-bottom:6px;">Get your salon's estimate</span>
+    <p style="color:#4A423B;margin-bottom:20px;">Tell us a bit about your salon and we'll send a tailored estimate the same day.</p>
+    <div id="modal-form-slot"></div>
+  </div>
+</div>
 
 <script>
   (function(){
@@ -790,6 +829,48 @@
       });
     }, { threshold: 0 });
     io.observe(hero);
+  })();
+
+  // Modal — moves the real #lead-form node between its home spot and the
+  // modal slot, so there's only ever one form instance and one set of listeners.
+  (function(){
+    var overlay = document.getElementById('modal-overlay');
+    var closeBtn = document.getElementById('modal-close');
+    var slot = document.getElementById('modal-form-slot');
+    var anchor = document.getElementById('lead-form-anchor');
+    var formEl = document.getElementById('lead-form');
+    var openers = document.querySelectorAll('.js-open-modal');
+    if(!overlay || !slot || !anchor || !formEl || !openers.length) return;
+
+    function openModal(){
+      slot.appendChild(formEl);
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      var firstInput = formEl.querySelector('input');
+      if(firstInput) firstInput.focus();
+      if (window.gtag) gtag('event', 'modal_open');
+    }
+    function closeModal(){
+      anchor.insertAdjacentElement('afterend', formEl);
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    openers.forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        openModal();
+      });
+    });
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeModal();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && overlay.classList.contains('is-open')) closeModal();
+    });
   })();
 </script>
 </body>
