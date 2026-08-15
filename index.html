@@ -625,7 +625,7 @@
       var btn = form.querySelector('button[type="submit"]');
       btn.disabled = true; btn.textContent = 'Sending…';
       hint.textContent = '';
-      fetch('https://n8n.srv1803116.hstgr.cloud/webhook/fd87b1f1-984b-427a-8d89-d07653b0b761/ava-lead-form', {
+      fetch('https://n8n.srv1803116.hstgr.cloud/webhook/ava-lead-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
