@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-868CQK2F7P"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-868CQK2F7P');
+  </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ava — The AI front desk for independent salons</title>
@@ -449,16 +457,24 @@
     var value = document.getElementById('calc-value');
     var result = document.getElementById('calc-result');
     if(!calls || !value || !result) return;
+    var tracked = false;
     function fmt(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
-    function update(){
+    function render(){
       var c = Math.max(0, parseFloat(calls.value) || 0);
       var v = Math.max(0, parseFloat(value.value) || 0);
       var weekly = c * v * (1/3);
       result.textContent = fmt(weekly * 4.33);
     }
-    calls.addEventListener('input', update);
-    value.addEventListener('input', update);
-    update();
+    function onInput(){
+      render();
+      if(!tracked){
+        tracked = true;
+        if (window.gtag) gtag('event', 'calculator_used');
+      }
+    }
+    calls.addEventListener('input', onInput);
+    value.addEventListener('input', onInput);
+    render();
   })();
 </script>
 
@@ -615,6 +631,13 @@
     var form = document.getElementById('lead-form');
     var hint = document.getElementById('lead-hint');
     if(!form) return;
+    var startTracked = false;
+    form.addEventListener('focusin', function(){
+      if(!startTracked){
+        startTracked = true;
+        if (window.gtag) gtag('event', 'form_start', { form: 'lead_form' });
+      }
+    });
     form.addEventListener('submit', function(e){
       e.preventDefault();
       var d = new FormData(form);
@@ -635,6 +658,7 @@
         form.reset();
         hint.textContent = "Got it — we'll send your estimate today.";
         btn.disabled = false; btn.textContent = "Get my salon's estimate";
+        if (window.gtag) gtag('event', 'form_submit', { form: 'lead_form' });
       })
       .catch(function(){
         hint.textContent = "Something went wrong — email us directly at tariq.syed@live.ca and we'll take it from there.";
@@ -662,8 +686,7 @@
 </footer>
 
 <script>
-  // Lightweight click tracking. Fires into window.dataLayer / gtag if you add
-  // Google Analytics or Meta Pixel later — safe no-op until then.
+  // Click tracking — now firing into real GA4 (G-868CQK2F7P) via gtag above.
   document.querySelectorAll('a[href^="tel:"], a[href^="mailto:"], .btn').forEach(function(el){
     el.addEventListener('click', function(){
       var label = el.textContent.trim();
