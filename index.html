@@ -27,7 +27,7 @@
     --paper-2:#E7DED0;
     --brass:#B98A4E;
     --wine:#A3452A;
-    --chrome:#8A7F74;
+    --chrome:#5F564D;
     --line:#DDD0BC;
     --white:#FBF8F3;
   }
@@ -350,7 +350,7 @@ padding-bottom:64px;
     padding:28px 0;
     border-bottom:1px solid var(--line);
   }
-  .menu-item .idx{font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:13px;padding-top:4px;}
+  .menu-item .idx{font-family:'IBM Plex Mono',monospace;color:#8A6230;font-size:13px;padding-top:4px;}
   .menu-item h3{font-family:'Manrope',sans-serif;font-weight:700;font-size:20px;margin-bottom:6px;}
   .menu-item p{color:#4A423B;max-width:52ch;font-size:15.5px;}
   .menu-item .tag{
@@ -451,6 +451,8 @@ padding-bottom:64px;
     <a class="nav-cta" href="#demo">Hear her live →</a>
   </nav>
 </header>
+
+<main>
 
 <section class="hero wrap">
   <div>
@@ -714,7 +716,7 @@ padding-bottom:64px;
   </div>
 </section>
 
-<div class="modal-overlay" id="modal-overlay" aria-hidden="true">
+<div class="modal-overlay" id="modal-overlay" inert>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
     <span class="serif-i" id="modal-title" style="display:block;margin-bottom:6px;">Get your salon's estimate</span>
@@ -764,6 +766,8 @@ padding-bottom:64px;
     });
   })();
 </script>
+
+</main>
 
 <footer>
   <div class="wrap">
@@ -846,7 +850,7 @@ padding-bottom:64px;
     function openModal(){
       slot.appendChild(formEl);
       overlay.classList.add('is-open');
-      overlay.setAttribute('aria-hidden', 'false');
+      overlay.removeAttribute('inert');
       document.body.style.overflow = 'hidden';
       var firstInput = formEl.querySelector('input');
       if(firstInput) firstInput.focus();
@@ -855,7 +859,7 @@ padding-bottom:64px;
     function closeModal(){
       anchor.insertAdjacentElement('afterend', formEl);
       overlay.classList.remove('is-open');
-      overlay.setAttribute('aria-hidden', 'true');
+      overlay.setAttribute('inert', '');
       document.body.style.overflow = '';
     }
 
